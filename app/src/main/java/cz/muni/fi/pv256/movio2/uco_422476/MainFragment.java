@@ -1,16 +1,20 @@
 package cz.muni.fi.pv256.movio2.uco_422476;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -26,7 +30,8 @@ public class MainFragment extends Fragment {
     private int mPosition = ListView.INVALID_POSITION;
     private OnFilmSelectListener mListener;
     private Context mContext;
-    private RecyclerView mListView;
+    private RecyclerView mRecyclerView;
+    private ArrayList<Film> mMovieList;
 
     @Override
     public void onAttach(Context activity) {
@@ -57,21 +62,58 @@ public class MainFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
-
-        final ArrayList<Film> filmList = ((MainActivity)getActivity()).getFilmList();
-        SetListener((Button) view.findViewById(R.id.button1), 0, filmList);
-        SetListener((Button) view.findViewById(R.id.button2), 1, filmList);
-        SetListener((Button) view.findViewById(R.id.button3), 2, filmList);
-
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-
-            if (mPosition != ListView.INVALID_POSITION) {
-                //mListView.smoothScrollToPosition(mPosition);
+        if (!fillRecyclerView(view)) {
+            view = inflater.inflate(R.layout.list_empty_layout, container, false);
+            if (!hasInternetConnection()) {
+                ((TextView) (view.findViewById(R.id.emptyText))).setText("Žádné připojení");
             }
         }
+        else {
+            if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+                mPosition = savedInstanceState.getInt(SELECTED_KEY);
 
+                if (mPosition != ListView.INVALID_POSITION) {
+                    mRecyclerView.smoothScrollToPosition(mPosition);
+                }
+            }
+        }
         return view;
+    }
+
+    public boolean hasInternetConnection()
+    {
+        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo network = cm.getActiveNetworkInfo();
+        if (network != null && network.isConnected())
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean fillRecyclerView(View rootView) {
+        mMovieList = FilmData.getInstance().getFilmList();
+
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_films);
+
+        if (mMovieList != null && !mMovieList.isEmpty()) {
+            setAdapter(mRecyclerView, mMovieList);
+            return true;
+        }
+        return false;
+    }
+
+    private void setAdapter(RecyclerView filmRV, final ArrayList<Film> movieList) {
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(movieList, mContext, this);
+        filmRV.setAdapter(adapter);
+        filmRV.setLayoutManager(new LinearLayoutManager(mContext));
+        filmRV.setItemAnimator(new DefaultItemAnimator());
+    }
+
+    public void clickedFilm(int position)
+    {
+        mPosition = position;
+        mListener.onFilmSelect(mMovieList.get(position));
     }
 
     @Override
@@ -80,15 +122,6 @@ public class MainFragment extends Fragment {
             outState.putInt(SELECTED_KEY, mPosition);
         }
         super.onSaveInstanceState(outState);
-    }
-
-    private void SetListener(Button button, final int position, final ArrayList<Film> filmList) {
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mPosition = position;
-                mListener.onFilmSelect(filmList.get(position));
-            }
-        });
     }
 
     public interface OnFilmSelectListener {

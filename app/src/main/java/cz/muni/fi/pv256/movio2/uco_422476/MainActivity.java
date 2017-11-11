@@ -11,16 +11,10 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFilmSelectListener {
 
     private boolean mTwoPane;
-    private ArrayList<Film> mFilmList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mFilmList.add(new Film(Calendar.getInstance().getTime().getTime(), "", "Film 1", "", 1));
-        mFilmList.add(new Film(Calendar.getInstance().getTime().getTime(), "", "Film 2", "", 2));
-        mFilmList.add(new Film(Calendar.getInstance().getTime().getTime(), "", "Film 3", "", 3));
-
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.film_detail_container) != null) {
             mTwoPane = true;
@@ -50,9 +44,5 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
             intent.putExtra(FilmDetailActivity.DETAILED_FILM, film);
             startActivity(intent);
         }
-    }
-
-    public ArrayList<Film> getFilmList() {
-        return mFilmList;
     }
 }

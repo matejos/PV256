@@ -59,9 +59,9 @@ public class MainFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         final ArrayList<Film> filmList = ((MainActivity)getActivity()).getFilmList();
-        SetListener((Button) view.findViewById(R.id.button1), 0, filmList);
-        SetListener((Button) view.findViewById(R.id.button2), 1, filmList);
-        SetListener((Button) view.findViewById(R.id.button3), 2, filmList);
+        setListener((Button) view.findViewById(R.id.button1), 0, filmList);
+        setListener((Button) view.findViewById(R.id.button2), 1, filmList);
+        setListener((Button) view.findViewById(R.id.button3), 2, filmList);
 
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
@@ -82,7 +82,7 @@ public class MainFragment extends Fragment {
         super.onSaveInstanceState(outState);
     }
 
-    private void SetListener(Button button, final int position, final ArrayList<Film> filmList) {
+    private void setListener(Button button, final int position, final ArrayList<Film> filmList) {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mPosition = position;

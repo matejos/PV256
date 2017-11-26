@@ -17,9 +17,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mFilmList.add(new Film(Calendar.getInstance().getTime().getTime(), "", "Film 1", "", 1));
-        mFilmList.add(new Film(Calendar.getInstance().getTime().getTime(), "", "Film 2", "", 2));
-        mFilmList.add(new Film(Calendar.getInstance().getTime().getTime(), "", "Film 3", "", 3));
+        mFilmList.add(new Film(Calendar.getInstance().getTimeInMillis(), "", "Film 1", "", 1));
+        mFilmList.add(new Film(Calendar.getInstance().getTimeInMillis(), "", "Film 2", "", 2));
+        mFilmList.add(new Film(Calendar.getInstance().getTimeInMillis(), "", "Film 3", "", 3));
 
         setContentView(R.layout.activity_main);
         if (findViewById(R.id.film_detail_container) != null) {

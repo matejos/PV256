@@ -40,7 +40,8 @@ public class MainFragment extends Fragment {
         try {
             mListener = (OnFilmSelectListener) activity;
         } catch (ClassCastException e) {
-            Log.e(TAG, "Activity must implement OnFilmSelectListener", e);
+            if(BuildConfig.logging)
+                Log.e(TAG, "Activity must implement OnFilmSelectListener", e);
         }
     }
 

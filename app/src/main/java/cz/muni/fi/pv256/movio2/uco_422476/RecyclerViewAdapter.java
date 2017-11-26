@@ -46,14 +46,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         LayoutInflater inflater = (LayoutInflater) mAppContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.list_item_film, parent, false);
         TextView text = (TextView) view.findViewById(R.id.list_item_text);
-        Log.d("Inflating", "Inflating " + parent.getId());
+        if(BuildConfig.logging)
+            Log.d("Inflating", "Inflating " + parent.getId());
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, final int position) {
         Film film = mFilmList.get(position);
-        Log.d("Binding", "Binding " + film.getTitle());
+        if(BuildConfig.logging)
+            Log.d("Binding", "Binding " + film.getTitle());
         holder.text.setText(film.getTitle());
         holder.popularity.setText(String.valueOf(film.getPopularity()));
 

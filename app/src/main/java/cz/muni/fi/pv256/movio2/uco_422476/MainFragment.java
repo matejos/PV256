@@ -85,11 +85,7 @@ public class MainFragment extends Fragment {
     {
         ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo network = cm.getActiveNetworkInfo();
-        if (network != null && network.isConnected())
-        {
-            return true;
-        }
-        return false;
+        return (network != null && network.isConnected());
     }
 
     private boolean fillRecyclerView(View rootView) {

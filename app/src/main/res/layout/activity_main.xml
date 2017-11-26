@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
                                              android:layout_height="match_parent"
+                                             android:id="@+id/drawer_layout"
                                              tools:context="cz.muni.fi.pv256.movio2.uco_422476.MainActivity">
-
-    <android.support.v7.widget.RecyclerView
-        android:layout_width="138dp"
-        android:layout_height="495dp"
-        tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp"/>
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/fragment_main"
@@ -19,4 +14,13 @@
               android:layout_height="match_parent"
               tools:context="cz.muni.fi.pv256.movio2.uco_422476.MainActivity"
               tools:layout="@android:layout/list_content" />
-</android.support.constraint.ConstraintLayout>
+    <ListView
+        android:id="@+id/left_drawer"
+        android:layout_width="150dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        android:background="#111"/>
+</android.support.v4.widget.DrawerLayout>

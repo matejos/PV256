@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="filmDetail">Film detail</string>
+    <string name="app_name">Movio 2</string>
+    <string-array name="menu_items">
+        <item>Latest</item>
+        <item>Popular</item>
+    </string-array>
 </resources>

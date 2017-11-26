@@ -29,11 +29,11 @@ public class FilmData {
         Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("GMT+1:00"));
 
         cal.set(2016, 01, 12);
-        mFilmList.add(new Film(cal.getTime().getTime(), "deadpool", "Deadpool", "deadpool_back", 7.4f));
+        mFilmList.add(new Film(cal.getTimeInMillis(), "deadpool", "Deadpool", "deadpool_back", 7.4f));
         cal.set(2016, 05, 10);
-        mFilmList.add(new Film(cal.getTime().getTime(), "now_you_see_me", "Now You See Me 2", "now_you_see_me_back", 6.7f));
+        mFilmList.add(new Film(cal.getTimeInMillis(), "now_you_see_me", "Now You See Me 2", "now_you_see_me_back", 6.7f));
         cal.set(2017, 06, 23);
-        mFilmList.add(new Film(cal.getTime().getTime(), "emoji_movie", "The Emoji Movie", "emoji_movie_back", 5.7f));
+        mFilmList.add(new Film(cal.getTimeInMillis(), "emoji_movie", "The Emoji Movie", "emoji_movie_back", 5.7f));
     }
 
     public ArrayList<Film> getFilmList() {

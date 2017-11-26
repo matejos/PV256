@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string-array name="menu_items">
+        <item>Latest</item>
+        <item>Popular</item>
+    </string-array>
 </resources>

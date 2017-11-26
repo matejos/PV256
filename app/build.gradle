@@ -2,6 +2,7 @@ def VERSION_MAJOR = 0
 def VERSION_MINOR = 1
 def VERSION_PATCH = 0
 def VERSION_BUILD = 0
+def VERSION_CODE = 1
 
 apply plugin: 'com.android.application'
 
@@ -30,7 +31,7 @@ android {
         applicationId "cz.muni.fi.pv256.movio2.uco_422476"
         minSdkVersion 17
         targetSdkVersion 25
-        versionCode 1
+        versionCode VERSION_CODE
         versionName "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         resConfigs "cs", "en"

@@ -1,9 +1,8 @@
 package cz.muni.fi.pv256.movio2.uco_422476;
 
 import android.content.Context;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -52,16 +53,31 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         Film film = mFilmList.get(position);
         if(BuildConfig.logging)
             Log.d("Binding", "Binding " + film.getTitle());
         holder.text.setText(film.getTitle());
         holder.popularity.setText(String.valueOf(film.getPopularity()));
 
-        int coverId = mAppContext.getResources().getIdentifier(film.getBackdrop(), "drawable", mAppContext.getPackageName());
-        Drawable cover = mAppContext.getResources().getDrawable(coverId);
-        holder.coverIv.setImageDrawable(cover);
+        Picasso.with(mAppContext).load("https://image.tmdb.org/t/p/w500/" + film.getBackdrop()).into(holder.backdropIv, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                Palette palette = Palette.generate(((BitmapDrawable)holder.backdropIv.getDrawable()).getBitmap());
+                int backgroundColorOpaque = palette.getDarkVibrantColor(0x000000);
+                int backgroundColorTransparent = Color.argb(128, Color.red(backgroundColorOpaque), Color.green(backgroundColorOpaque), Color.blue(backgroundColorOpaque));
+                GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[] {Color.TRANSPARENT, backgroundColorOpaque});
+                holder.text.setBackgroundColor(backgroundColorTransparent);
+                holder.star.setBackground(gd);
+                holder.popularity.setBackgroundColor(backgroundColorOpaque);
+            }
+
+            @Override
+            public void onError() {
+                if(BuildConfig.logging)
+                    Log.e("Loading image failed", "Error loading backdrop image");
+            }
+        });
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,19 +86,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             }
         });
 
-        Palette palette = Palette.generate(BitmapFactory.decodeResource(mAppContext.getResources(), coverId));
-        int backgroundColorOpaque = palette.getDarkVibrantColor(0x000000);
-        int backgroundColorTransparent = Color.argb(128, Color.red(backgroundColorOpaque), Color.green(backgroundColorOpaque), Color.blue(backgroundColorOpaque));
-        GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[] {Color.TRANSPARENT, backgroundColorOpaque});
-        holder.text.setBackgroundColor(backgroundColorTransparent);
-        holder.star.setBackground(gd);
-        holder.popularity.setBackgroundColor(backgroundColorOpaque);
-
         holder.itemView.setTag(film);
     }
 
+    public void dataUpdate(ArrayList<Film> data) {
+        this.mFilmList = data;
+        notifyDataSetChanged();
+    }
+
     static class ViewHolder extends RecyclerView.ViewHolder {
-        private ImageView coverIv;
+        private ImageView backdropIv;
         public TextView text;
         public ImageView star;
         public TextView popularity;
@@ -90,7 +103,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         public ViewHolder(View view) {
             super(view);
             text = (TextView) itemView.findViewById(R.id.list_item_text);
-            coverIv = (ImageView) view.findViewById(R.id.list_item_icon);
+            backdropIv = (ImageView) view.findViewById(R.id.list_item_icon);
             star = (ImageView) itemView.findViewById(R.id.list_item_star);
             popularity = (TextView) itemView.findViewById(R.id.list_item_popularity);
         }

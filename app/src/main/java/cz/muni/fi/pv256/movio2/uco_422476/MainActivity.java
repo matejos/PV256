@@ -4,22 +4,16 @@ import android.content.Intent;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import java.util.ArrayList;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFilmSelectListener {
 
@@ -30,11 +24,14 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private ActionBarDrawerToggle mDrawerToggle;
     private String[] mMenuItems;
     private boolean mDrawerOpen;
+    protected static SparseArray<Object> mData = new SparseArray<Object>();
+    protected static int mCategory;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         if (findViewById(R.id.film_detail_container) != null) {
             mTwoPane = true;
             if (savedInstanceState == null) {
@@ -109,12 +106,15 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             selectItem(position);
+            MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+            mainFragment.downloadAndUpdate();
         }
     }
 
     private void selectItem(int position) {
         mDrawerList.setItemChecked(position, true);
         setTitle(mMenuItems[position]);
+        mCategory = position;
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 

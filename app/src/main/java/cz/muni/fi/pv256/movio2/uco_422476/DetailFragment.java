@@ -1,7 +1,6 @@
 package cz.muni.fi.pv256.movio2.uco_422476;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -10,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,15 +50,15 @@ public class DetailFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         TextView titleTv = (TextView) view.findViewById(R.id.detail_film);
         TextView titleLowTv = (TextView) view.findViewById(R.id.detail_film_low);
-        ImageView imageView = (ImageView) view.findViewById(R.id.detail_icon);
+        TextView descTv = (TextView) view.findViewById(R.id.detail_film_desc);
+        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_icon);
         if (mFilm != null) {
             titleTv.setText(mFilm.getTitle());
-            SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-            String dateString = formatter.format(new Date(mFilm.getReleaseDate()));
+            java.text.DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(mContext);
+            String dateString = dateFormat.format(mFilm.getReleaseDate());
             titleLowTv.setText(dateString);
-            int coverId = mContext.getResources().getIdentifier(mFilm.getCoverPath(), "drawable", mContext.getPackageName());
-            Drawable cover = mContext.getResources().getDrawable(coverId);
-            imageView.setImageDrawable(cover);
+            descTv.setText(mFilm.getDescription());
+            Picasso.with(mContext).load("https://image.tmdb.org/t/p/w342/" + mFilm.getCoverPath()).into(coverIv);
         }
         return view;
     }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="filmDetail">フィルムの詳細</string>
+    <string name="dataDownloading">データをダウンロード中…</string>
+    <string name="dataSuccess">データが正常にダウンロードされた</string>
+    <string name="dataError">データのダウンロード中にエラーが発生しました</string>
+    <string-array name="menu_items">
+        <item>最新</item>
+        <item>人気</item>
+    </string-array>
+</resources>

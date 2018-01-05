@@ -4,6 +4,7 @@
     <string name="dataDownloading">Stahuji dáta…</string>
     <string name="dataSuccess">Dáta úspěšně staženy</string>
     <string name="dataError">Vyskytl se problém při stahování dat</string>
+    <string name="noConnection">Žádné připojení!</string>
     <string-array name="menu_items">
         <item>Nejnovší</item>
         <item>Populární</item>

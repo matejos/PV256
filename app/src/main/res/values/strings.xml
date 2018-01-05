@@ -5,6 +5,7 @@
     <string name="dataDownloading">Downloading data…</string>
     <string name="dataSuccess">Data successfully downloaded</string>
     <string name="dataError">Error occurred while downloading data</string>
+    <string name="noConnection">No Internet connection!</string>
     "Data has not been received"
     <string-array name="menu_items">
         <item>Latest</item>

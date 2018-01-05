@@ -1,12 +1,13 @@
 package cz.muni.fi.pv256.movio2.uco_422476;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,15 +17,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static cz.muni.fi.pv256.movio2.uco_422476.MainActivity.mData;
 import static cz.muni.fi.pv256.movio2.uco_422476.MainActivity.mCategory;
+import static cz.muni.fi.pv256.movio2.uco_422476.DownloadService.ACTION;
+import static cz.muni.fi.pv256.movio2.uco_422476.DownloadService.ERROR;
+import static cz.muni.fi.pv256.movio2.uco_422476.DownloadService.LATEST;
+import static cz.muni.fi.pv256.movio2.uco_422476.DownloadService.NO_ERROR;
+import static cz.muni.fi.pv256.movio2.uco_422476.DownloadService.POPULAR;
 
 /**
  * Created by Matej on 3.11.2017.
@@ -41,7 +43,7 @@ public class MainFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private ViewStub mEmptyView;
     private RecyclerViewAdapter mRecyclerViewAdapter;
-    private DownloadingTask mDownloadingTask;
+    private DownloadReceiver mReceiver;
 
     @Override
     public void onAttach(Context activity) {
@@ -74,32 +76,21 @@ public class MainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         mEmptyView = (ViewStub) view.findViewById(R.id.empty);
-        if (!hasInternetConnection()) {
-            ((TextView) (view.findViewById(R.id.emptyText))).setText("Žádné připojení");
-        }
-        else {
-            mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_films);
-            if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-                mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recyclerview_films);
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
 
-                if (mPosition != ListView.INVALID_POSITION) {
-                    mRecyclerView.smoothScrollToPosition(mPosition);
-                }
+            if (mPosition != ListView.INVALID_POSITION) {
+                mRecyclerView.smoothScrollToPosition(mPosition);
             }
-            mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Film>(), mContext, this);
-            mRecyclerView.setAdapter(mRecyclerViewAdapter);
-            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            downloadAndUpdate();
         }
-        return view;
-    }
+        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Film>(), mContext, this);
+        mRecyclerView.setAdapter(mRecyclerViewAdapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        downloadAndUpdate();
 
-    public boolean hasInternetConnection()
-    {
-        ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo network = cm.getActiveNetworkInfo();
-        return (network != null && network.isConnected());
+        return view;
     }
 
     public void clickedFilm(int position)
@@ -122,9 +113,11 @@ public class MainFragment extends Fragment {
 
     public void downloadAndUpdate() {
         if (mData.get(mCategory) == null) {
-            mDownloadingTask = new DownloadingTask();
-            Toast.makeText(getActivity().getApplicationContext(), R.string.dataDownloading, Toast.LENGTH_SHORT).show();
-            mDownloadingTask.execute();
+            Intent intent = new Intent(getActivity(), DownloadService.class);
+            getActivity().startService(intent);
+            IntentFilter intentFilter = new IntentFilter(ACTION);
+            mReceiver = new DownloadReceiver();
+            LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
         }
         else {
             updateViewAdapter();
@@ -132,64 +125,48 @@ public class MainFragment extends Fragment {
     }
 
     private void updateViewAdapter() {
-        MainFragment.this.getActivity().runOnUiThread(new Runnable() {
+        getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 mRecyclerViewAdapter.dataUpdate(((ArrayList<Film>)mData.get(mCategory)));
+                if (mData.get(mCategory) != null && !((ArrayList<Film>)mData.get(mCategory)).isEmpty()) {
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    mEmptyView.setVisibility(View.GONE);
+                } else {
+                    mRecyclerView.setVisibility(View.GONE);
+                    mEmptyView.setVisibility(View.VISIBLE);
+                }
             }
         });
     }
 
-    private class DownloadingTask extends AsyncTask<Void, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            if(BuildConfig.logging)
-                Log.d(TAG, "doInBackground - thread: " + Thread.currentThread().getName());
-            try {
-                mData.put(mCategory, new ArrayList<Film>());
-                switch (mCategory) {
-                    case 0:
-                        ((ArrayList<Film>)mData.get(mCategory)).addAll(Networking.getLatestFilms());
-                        break;
-                    case 1:
-                        ((ArrayList<Film>)mData.get(mCategory)).addAll(Networking.getPopularFilms());
-                        break;
+    public class DownloadReceiver extends BroadcastReceiver {
+         @Override
+         public void onReceive(Context context, Intent intent) {
+            String error = intent.getStringExtra(ERROR);
+            if(error.equals(NO_ERROR)) {
+                    mData.put(mCategory, new ArrayList<Film>());
+                    switch (mCategory) {
+                        case 0:
+                            ((ArrayList<Film>)mData.get(mCategory)).addAll(getFilms((ArrayList<FilmDTO>)intent.getSerializableExtra(LATEST)));
+                            break;
+                        case 1:
+                            ((ArrayList<Film>)mData.get(mCategory)).addAll(getFilms((ArrayList<FilmDTO>)intent.getSerializableExtra(POPULAR)));
+                            break;
+                    }
+                    updateViewAdapter();
                 }
-                updateViewAdapter();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            if(BuildConfig.logging)
-                Log.d(TAG, "onPostExecute - thread: " + Thread.currentThread().getName());
-            if (result) {
-                Toast.makeText(getActivity().getApplicationContext(), R.string.dataSuccess, Toast.LENGTH_SHORT).show();
-            }
             else {
-                Toast.makeText(getActivity().getApplicationContext(), R.string.dataError, Toast.LENGTH_SHORT).show();
+                updateViewAdapter();
             }
-
-            if (((ArrayList<Film>)mData.get(mCategory)).isEmpty()) {
-                mRecyclerView.setVisibility(View.GONE);
-                mEmptyView.setVisibility(View.VISIBLE);
-            } else {
-                mRecyclerView.setVisibility(View.VISIBLE);
-                mEmptyView.setVisibility(View.GONE);
-            }
-            mDownloadingTask = null;
         }
-
-        @Override
-        protected void onCancelled() {
-            if(BuildConfig.logging)
-                Log.d(TAG, "onCancelled - thread: " + Thread.currentThread().getName());
+        private ArrayList<Film> getFilms(ArrayList<FilmDTO> filmList){
+            ArrayList<Film> films = new ArrayList<Film>();
+            for (FilmDTO m : filmList) {
+                Film film = new Film(m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat(), m.getDescription());
+                films.add(film);
+                }
+            return films;
         }
-    }
+     }
 }

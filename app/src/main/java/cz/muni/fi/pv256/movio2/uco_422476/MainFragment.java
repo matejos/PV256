@@ -125,6 +125,8 @@ public class MainFragment extends Fragment {
     }
 
     private void updateViewAdapter() {
+        if (getActivity() == null)
+            return;
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private String[] mMenuItems;
     private boolean mDrawerOpen;
     protected static SparseArray<Object> mData = new SparseArray<Object>();
-    protected static int mCategory;
+    protected static int mCategory = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,9 +69,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        if (savedInstanceState == null) {
-            selectItem(0);
-        }
+        selectItem(mCategory);
 
         if (mDrawerOpen)
         {

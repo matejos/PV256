@@ -131,6 +131,7 @@ public class MainFragment extends Fragment {
                 mRecyclerViewAdapter.dataUpdate(((ArrayList<Film>)mData.get(mCategory)));
                 if (mData.get(mCategory) != null && !((ArrayList<Film>)mData.get(mCategory)).isEmpty()) {
                     mRecyclerView.setVisibility(View.VISIBLE);
+                    mRecyclerView.smoothScrollToPosition(0);
                     mEmptyView.setVisibility(View.GONE);
                 } else {
                     mRecyclerView.setVisibility(View.GONE);

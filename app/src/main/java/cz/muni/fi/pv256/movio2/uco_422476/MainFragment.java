@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -31,7 +33,7 @@ public class MainFragment extends Fragment {
     private OnFilmSelectListener mListener;
     private Context mContext;
     private RecyclerView mRecyclerView;
-    private ArrayList<Film> mMovieList;
+    private ArrayList<Object> mDataList;
 
     @Override
     public void onAttach(Context activity) {
@@ -88,18 +90,22 @@ public class MainFragment extends Fragment {
     }
 
     private boolean fillRecyclerView(View rootView) {
-        mMovieList = FilmData.getInstance().getFilmList();
+        mDataList = new ArrayList<>();
+        mDataList.add("Latest");
+        mDataList.addAll(FilmData.getInstance().getLatestFilms());
+        mDataList.add("Popular");
+        mDataList.addAll(FilmData.getInstance().getPopularFilms());
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_films);
 
-        if (mMovieList != null && !mMovieList.isEmpty()) {
-            setAdapter(mRecyclerView, mMovieList);
+        if (mDataList != null && !mDataList.isEmpty()) {
+            setAdapter(mRecyclerView, mDataList);
             return true;
         }
         return false;
     }
 
-    private void setAdapter(RecyclerView filmRV, final ArrayList<Film> movieList) {
+    private void setAdapter(RecyclerView filmRV, final ArrayList<Object> movieList) {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(movieList, mContext, this);
         filmRV.setAdapter(adapter);
         filmRV.setLayoutManager(new LinearLayoutManager(mContext));
@@ -109,7 +115,7 @@ public class MainFragment extends Fragment {
     public void clickedFilm(int position)
     {
         mPosition = position;
-        mListener.onFilmSelect(mMovieList.get(position));
+        mListener.onFilmSelect((Film) mDataList.get(position));
     }
 
     @Override
@@ -122,5 +128,21 @@ public class MainFragment extends Fragment {
 
     public interface OnFilmSelectListener {
         void onFilmSelect(Film film);
+    }
+
+    public void scrollToCategory(int category) {
+        ArrayList<Integer> categories = new ArrayList<>();
+        for (int i = 0; i < mDataList.size(); i++) {
+            if (!(mDataList.get(i) instanceof Film)) {
+                categories.add(i);
+            }
+        }
+        RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(mContext) {
+            @Override protected int getVerticalSnapPreference() {
+                return LinearSmoothScroller.SNAP_TO_START;
+            }
+        };
+        smoothScroller.setTargetPosition(categories.get(category));
+        ((LinearLayoutManager) mRecyclerView.getLayoutManager()).startSmoothScroll(smoothScroller);
     }
 }

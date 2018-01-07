@@ -2,6 +2,7 @@ package cz.muni.fi.pv256.movio2.uco_422476;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
@@ -36,8 +37,14 @@ public class FilmData {
         mFilmList.add(new Film(cal.getTimeInMillis(), "emoji_movie", "The Emoji Movie", "emoji_movie_back", 5.7f));
     }
 
-    public ArrayList<Film> getFilmList() {
+    public ArrayList<Film> getLatestFilms() {
         return mFilmList;
+    }
+
+    public ArrayList<Film> getPopularFilms() {
+        ArrayList<Film> filmList = new ArrayList<>(mFilmList);
+        Collections.reverse(filmList);
+        return filmList;
     }
 
     public void setFilmList(ArrayList<Film> filmList) {

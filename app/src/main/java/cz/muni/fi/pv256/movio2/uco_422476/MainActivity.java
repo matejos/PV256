@@ -54,15 +54,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
                         .replace(R.id.film_detail_container, new DetailFragment(), DetailFragment.TAG)
                         .commit();
             }
-            mPosition = getIntent().getIntExtra(POSITION, ListView.INVALID_POSITION);
-            Film film = getIntent().getParcelableExtra(SELECTED_FILM);
-            if (film != null) {
-                onFilmSelect(film, mPosition);
-            }
-            mSwitched = getIntent().getBooleanExtra(SWITCH, false);
-
-            ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).setPosition(mPosition);
-            ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).updateData();
         } else {
             mTwoPane = false;
         }
@@ -72,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         }
 
         mMenuItems = getResources().getStringArray(R.array.menu_items);
-        mTitle = mMenuItems[mCategory];
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
@@ -82,8 +72,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout,
-                R.string.app_name, R.string.app_name) {
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, 0, 0) {
             public void onDrawerClosed(View view) {
                 super.onDrawerClosed(view);
                 invalidateOptionsMenu();
@@ -96,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        mDrawerList.setItemChecked(mCategory, true);
 
         if (mDrawerOpen)
         {
@@ -113,9 +101,23 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        mPosition = getIntent().getIntExtra(POSITION, ListView.INVALID_POSITION);
+        Film film = getIntent().getParcelableExtra(SELECTED_FILM);
+        if (film != null) {
+            onFilmSelect(film, mPosition);
+        }
+        mSwitched = getIntent().getBooleanExtra(SWITCH, false);
+
+        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).setPosition(mPosition);
+        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).updateData();
+    }
+
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mDrawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
-        setTitle(mTitle);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -132,6 +134,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         item.setActionView(R.layout.switch_layout);
         mSwitch = (SwitchCompat) item.getActionView().findViewById(R.id.switchForActionBar);
         mTitleTextView = (TextView) item.getActionView().findViewById(R.id.actionBarTitle);
+        mTitleTextView.setText(getApplicationContext().getApplicationInfo().nonLocalizedLabel);
         mSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,7 +145,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (compoundButton.isChecked()) {
-                    setTitle("");
                     compoundButton.setText(getResources().getString(R.string.favorites));
                     compoundButton.setChecked(true);
                     MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
@@ -151,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
                     mainFragment.updateData();
 
                 } else {
-                    setTitle(mMenuItems[mCategory]);
                     compoundButton.setText(getResources().getString(R.string.discover));
                     compoundButton.setChecked(false);
                     MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
@@ -190,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     }
 
     private void selectItem(int position) {
-        mDrawerList.setItemChecked(position, true);
+        mDrawerList.setItemChecked(position, false);
         mCategory = position;
         mDrawerLayout.closeDrawer(mDrawerList);
         ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).scrollToCategory(position);

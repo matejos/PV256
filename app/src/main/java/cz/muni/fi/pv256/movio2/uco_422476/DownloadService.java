@@ -106,7 +106,7 @@ public class DownloadService extends IntentService {
         PendingIntent pIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification.Builder n = new Notification.Builder(this);
-        n.setContentTitle(getResources().getString(R.string.app_name))
+        n.setContentTitle(getApplicationContext().getApplicationInfo().nonLocalizedLabel)
                 .setContentIntent(pIntent)
                 .setAutoCancel(true).build();
         return n;

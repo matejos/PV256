@@ -56,6 +56,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private boolean mIsFavorite;
     private FilmManager mFilmManager;
     private FilmDbHelper mDbHelper;
+    private String[] categories;
 
     public boolean getIsFavorite() {
         return mIsFavorite;
@@ -95,6 +96,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity().getApplicationContext();
+        categories = getResources().getStringArray(R.array.menu_items);
     }
 
     @Override
@@ -114,8 +116,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
             if (mPosition != ListView.INVALID_POSITION) {
-                mRecyclerView.smoothScrollToPosition(mPosition);
-                Log.d("xd shit scroll", String.valueOf(mPosition));
+                scrollToPosition(mPosition);
             }
         }
         mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<ListItem>(), mContext, this);
@@ -137,8 +138,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mRecyclerView.smoothScrollToPosition(mPosition);
-                Log.d("xd shit scroll2", String.valueOf(mPosition));
+                scrollToPosition(mPosition);
             }
         });
     }
@@ -215,8 +215,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 if (filmList != null && !(filmList.isEmpty())) {
                     mRecyclerView.setVisibility(View.VISIBLE);
                     if (mPosition != ListView.INVALID_POSITION)
-                        mRecyclerView.smoothScrollToPosition(mPosition);
-                    Log.d("xd shit scroll3", String.valueOf(mPosition));
+                        scrollToPosition(mPosition);
                     mEmptyView.setVisibility(View.GONE);
                 } else {
                     mRecyclerView.setVisibility(View.GONE);
@@ -232,7 +231,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         public void onReceive(Context context, Intent intent) {
             String error = intent.getStringExtra(ERROR);
             if (error.equals(NO_ERROR)) {
-                String[] categories = getResources().getStringArray(R.array.menu_items);
                 mData = new ArrayList<>();
                 mData.add(new Category(categories[0]));
                 mData.addAll(getFilms((ArrayList<FilmDTO>) intent.getSerializableExtra(LATEST)));
@@ -264,13 +262,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 }
             }
         }
+        scrollToPosition(categories.get(category));
+    }
+
+    private void scrollToPosition(int position) {
         RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(mContext) {
             @Override
             protected int getVerticalSnapPreference() {
                 return LinearSmoothScroller.SNAP_TO_START;
             }
         };
-        smoothScroller.setTargetPosition(categories.get(category));
-        ((LinearLayoutManager) mRecyclerView.getLayoutManager()).startSmoothScroll(smoothScroller);
+        smoothScroller.setTargetPosition(position);
+        if (mRecyclerView.getLayoutManager() != null)
+            ((LinearLayoutManager) mRecyclerView.getLayoutManager()).startSmoothScroll(smoothScroller);
     }
 }

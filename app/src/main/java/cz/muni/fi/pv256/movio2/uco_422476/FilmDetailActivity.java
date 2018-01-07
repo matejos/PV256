@@ -25,6 +25,7 @@ public class FilmDetailActivity extends AppCompatActivity {
         Film film = getIntent().getParcelableExtra(DETAILED_FILM);
         if (findViewById(R.id.widedetail) != null) {
             Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.putExtra(MainActivity.SELECTED_FILM, film);
             intent.putExtra(MainActivity.SWITCH, getIntent().getBooleanExtra(SWITCH, false));
             intent.putExtra(MainActivity.POSITION, getIntent().getIntExtra(POSITION, ListView.INVALID_POSITION));

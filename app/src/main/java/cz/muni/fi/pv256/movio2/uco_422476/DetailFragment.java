@@ -26,6 +26,7 @@ public class DetailFragment extends Fragment {
 
     public static final String TAG = DetailFragment.class.getSimpleName();
     private static final String ARGS_FILM = "args_film";
+    private static final String COVER_URL = "https://image.tmdb.org/t/p/w342/%s";
 
     private Context mContext;
     private Film mFilm;
@@ -73,35 +74,38 @@ public class DetailFragment extends Fragment {
             titleLowTv.setText(dateString);
             popularityTv.setText(String.valueOf(mFilm.getPopularity()));
             descTv.setText(mFilm.getDescription());
-            Picasso.with(mContext).load("https://image.tmdb.org/t/p/w342/" + mFilm.getCoverPath()).into(coverIv);
-
-            favoriteButton = (FloatingActionButton) view.findViewById(R.id.favorite);
-            if (mFilmManager.containsId(mFilm.getId())) {
-                favoriteButton.setImageResource(R.mipmap.ic_remove);
-            }
-
-            favoriteButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (mFilmManager.containsId(mFilm.getId())) {
-                        mFilmManager.deleteFilm(mFilm);
-                        Toast.makeText(getActivity(), mFilm.getTitle() + " " + getResources().getString(R.string.favoriteRemoved), Toast.LENGTH_SHORT).show();
-                        favoriteButton.setImageResource(R.mipmap.ic_add);
-                    }
-                    else {
-                        mFilmManager.createFilm(mFilm);
-                        Toast.makeText(getActivity(), mFilm.getTitle() + " " + getResources().getString(R.string.favoriteAdded), Toast.LENGTH_SHORT).show();
-                        favoriteButton.setImageResource(R.mipmap.ic_remove);
-                    }
-                    if (getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main) != null) {
-                        ((MainFragment)getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main)).updateData();
-                    }
-                }
-            });
+            Picasso.with(mContext).load(String.format(COVER_URL, mFilm.getCoverPath())).into(coverIv);
+            setFavoriteButtonListener(view);
         }
         else {
             starIv.setVisibility(View.INVISIBLE);
         }
         return view;
+    }
+
+    private void setFavoriteButtonListener(View view){
+        favoriteButton = (FloatingActionButton) view.findViewById(R.id.favorite);
+        if (mFilmManager.containsId(mFilm.getId())) {
+            favoriteButton.setImageResource(R.mipmap.ic_remove);
+        }
+
+        favoriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mFilmManager.containsId(mFilm.getId())) {
+                    mFilmManager.deleteFilm(mFilm);
+                    Toast.makeText(getActivity(), mFilm.getTitle() + " " + getResources().getString(R.string.favoriteRemoved), Toast.LENGTH_SHORT).show();
+                    favoriteButton.setImageResource(R.mipmap.ic_add);
+                }
+                else {
+                    mFilmManager.createFilm(mFilm);
+                    Toast.makeText(getActivity(), mFilm.getTitle() + " " + getResources().getString(R.string.favoriteAdded), Toast.LENGTH_SHORT).show();
+                    favoriteButton.setImageResource(R.mipmap.ic_remove);
+                }
+                if (getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main) != null) {
+                    ((MainFragment)getActivity().getSupportFragmentManager().findFragmentById(R.id.fragment_main)).updateData();
+                }
+            }
+        });
     }
 }

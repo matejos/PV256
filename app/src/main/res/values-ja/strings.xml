@@ -8,5 +8,6 @@
     <string-array name="menu_items">
         <item>最新</item>
         <item>人気</item>
+        <item>データをリフレッシュする</item>
     </string-array>
 </resources>

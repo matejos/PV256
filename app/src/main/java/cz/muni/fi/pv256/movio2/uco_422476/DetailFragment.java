@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -66,9 +67,8 @@ public class DetailFragment extends Fragment {
         TextView descTv = (TextView) view.findViewById(R.id.detail_film_desc);
         ImageView coverIv = (ImageView) view.findViewById(R.id.detail_cover);
         ImageView backdropIv = (ImageView) view.findViewById(R.id.detail_backdrop);
-        ImageView starIv = (ImageView) view.findViewById(R.id.detail_star);
         if (mFilm != null) {
-            starIv.setVisibility(View.VISIBLE);
+            setVisibility(view, View.VISIBLE);
             titleTv.setText(mFilm.getTitle());
             java.text.DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(mContext);
             String dateString = dateFormat.format(mFilm.getReleaseDate());
@@ -80,9 +80,18 @@ public class DetailFragment extends Fragment {
             setFavoriteButtonListener(view);
         }
         else {
-            starIv.setVisibility(View.INVISIBLE);
+            setVisibility(view, View.INVISIBLE);
         }
         return view;
+    }
+
+    private void setVisibility(View view, int visible) {
+        FloatingActionButton button = (FloatingActionButton) view.findViewById(R.id.favorite);
+        TextView overview = (TextView) view.findViewById(R.id.overview);
+        RelativeLayout rl = (RelativeLayout) view.findViewById(R.id.relativeLayout);
+        button.setVisibility(visible);
+        overview.setVisibility(visible);
+        rl.setVisibility(visible);
     }
 
     private void setFavoriteButtonListener(View view){

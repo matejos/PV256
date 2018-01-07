@@ -10,8 +10,13 @@
     <string name="discover">Discover</string>
     <string name="favorites">Favorites</string>
     <string name="overview">Overview</string>
+    <string name="updatingData">Updating data…</string>
+    <string name="dataUpdated">Data successfully updated.</string>
+    <string name="content_authority">cz.muni.fi.pv256.movio2.uco_422476.provider</string>
+    <string name="sync_account_type">cz.muni.fi.pv256.movio2.uco_422476.sync</string>
     <string-array name="menu_items">
         <item>Latest</item>
         <item>Popular</item>
+        <item>Update Data</item>
     </string-array>
 </resources>

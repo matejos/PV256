@@ -1,6 +1,9 @@
 package cz.muni.fi.pv256.movio2.uco_422476;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -8,8 +11,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
-import android.util.Log;
-import android.util.SparseArray;
 import android.view.Menu;
 import android.view.View;
 import android.view.MenuItem;
@@ -18,9 +19,11 @@ import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.List;
+
+import static cz.muni.fi.pv256.movio2.uco_422476.UpdaterSyncAdapter.SYNC_FINISHED;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFilmSelectListener {
 
@@ -90,6 +93,29 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
+        UpdaterSyncAdapter.initializeSyncAdapter(this);
+    }
+
+    private static IntentFilter syncIntentFilter = new IntentFilter(SYNC_FINISHED);
+
+    private BroadcastReceiver syncFinishedReceiver = new BroadcastReceiver() {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Toast.makeText(context, getResources().getString(R.string.dataUpdated), Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(syncFinishedReceiver, syncIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(syncFinishedReceiver);
+        super.onPause();
     }
 
 
@@ -182,18 +208,24 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            if (mSwitch.isChecked())
-                mSwitch.toggle();
-            selectItem(position);
-            MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
-            mainFragment.updateData();
+            if (position == mMenuItems.length - 1) {
+                UpdaterSyncAdapter.syncImmediately(getApplicationContext());
+                Toast.makeText(getApplicationContext(), getResources().getString(R.string.updatingData), Toast.LENGTH_SHORT).show();
+            }
+            else {
+                if (mSwitch.isChecked())
+                    mSwitch.toggle();
+                selectItem(position);
+                MainFragment mainFragment = (MainFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+                mainFragment.updateData();
+            }
+            mDrawerList.setItemChecked(position, false);
+            mDrawerLayout.closeDrawer(mDrawerList);
         }
     }
 
     private void selectItem(int position) {
-        mDrawerList.setItemChecked(position, false);
         mCategory = position;
-        mDrawerLayout.closeDrawer(mDrawerList);
         ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).scrollToCategory(position);
     }
 

@@ -10,8 +10,11 @@
     <string name="discover">Objevovat</string>
     <string name="favorites">Oblíbené</string>
     <string name="overview">Přehled</string>
+    <string name="updatingData">Aktualizuji data…</string>
+    <string name="dataUpdated">Data úspěšně aktualizovány.</string>
     <string-array name="menu_items">
         <item>Nejnovší</item>
         <item>Populární</item>
+        <item>Aktualizovat data</item>
     </string-array>
 </resources>

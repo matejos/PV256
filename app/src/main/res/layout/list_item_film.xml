@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:orientation="horizontal">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/list_item_icon"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentBottom="true">
+
+            <TextView
+                android:id="@+id/list_item_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:padding="10dp"
+                android:textColor="@android:color/white"
+                android:maxLines="1"
+                android:textSize="22dp"/>
+
+            <ImageView
+                android:id="@+id/list_item_star"
+                android:layout_width="46dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/list_item_text"
+                android:layout_alignTop="@+id/list_item_text"
+                android:layout_gravity="center"
+                android:layout_toStartOf="@+id/list_item_popularity"
+                android:scaleType="fitEnd"
+                android:padding="5dp"
+                android:src="@drawable/star"/>
+
+            <TextView
+                android:id="@+id/list_item_popularity"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:width="50dp"
+                android:fontFamily="sans-serif-condensed"
+                android:paddingBottom="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="10dp"
+                android:textColor="@android:color/white"
+                android:textSize="22dp"/>
+        </RelativeLayout>
+    </RelativeLayout>
+
+
+</LinearLayout>

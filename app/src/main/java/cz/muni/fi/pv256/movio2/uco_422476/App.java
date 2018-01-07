@@ -12,6 +12,8 @@ public class App extends Application {
 
     public static final String API_KEY = "92c2177de82d888d852b59046911ff8b";
     public static final String API_URL = "http://api.themoviedb.org/";
+    public static final String COVER_URL = "https://image.tmdb.org/t/p/w342/%s";
+    public static final String BACKDROP_URL = "https://image.tmdb.org/t/p/w500/%s";
 
     @Override
     public void onCreate() {

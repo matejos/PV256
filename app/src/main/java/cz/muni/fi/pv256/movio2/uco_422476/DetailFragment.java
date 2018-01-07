@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,8 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import static cz.muni.fi.pv256.movio2.uco_422476.MainActivity.mFavoriteData;
+import static cz.muni.fi.pv256.movio2.uco_422476.App.BACKDROP_URL;
+import static cz.muni.fi.pv256.movio2.uco_422476.App.COVER_URL;
 
 /**
  * Created by Matej on 3.11.2017.
@@ -26,7 +26,7 @@ public class DetailFragment extends Fragment {
 
     public static final String TAG = DetailFragment.class.getSimpleName();
     private static final String ARGS_FILM = "args_film";
-    private static final String COVER_URL = "https://image.tmdb.org/t/p/w342/%s";
+
 
     private Context mContext;
     private Film mFilm;
@@ -64,7 +64,8 @@ public class DetailFragment extends Fragment {
         TextView titleLowTv = (TextView) view.findViewById(R.id.detail_film_low);
         TextView popularityTv = (TextView) view.findViewById(R.id.detail_popularity);
         TextView descTv = (TextView) view.findViewById(R.id.detail_film_desc);
-        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_icon);
+        ImageView coverIv = (ImageView) view.findViewById(R.id.detail_cover);
+        ImageView backdropIv = (ImageView) view.findViewById(R.id.detail_backdrop);
         ImageView starIv = (ImageView) view.findViewById(R.id.detail_star);
         if (mFilm != null) {
             starIv.setVisibility(View.VISIBLE);
@@ -75,6 +76,7 @@ public class DetailFragment extends Fragment {
             popularityTv.setText(String.valueOf(mFilm.getPopularity()));
             descTv.setText(mFilm.getDescription());
             Picasso.with(mContext).load(String.format(COVER_URL, mFilm.getCoverPath())).into(coverIv);
+            Picasso.with(mContext).load(String.format(BACKDROP_URL, mFilm.getBackdrop())).into(backdropIv);
             setFavoriteButtonListener(view);
         }
         else {

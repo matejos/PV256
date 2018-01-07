@@ -17,6 +17,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+import static cz.muni.fi.pv256.movio2.uco_422476.App.BACKDROP_URL;
+
 /**
  * Created by Matej on 3.11.2017.
  */
@@ -27,6 +29,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private MainFragment mMainFragment;
     private final static int CATEGORY = 0;
     private final static int FILM = 1;
+
+    private static final String BACKDROP_URL = "https://image.tmdb.org/t/p/w500/%s";
 
     public RecyclerViewAdapter(ArrayList<ListItem> dataList, Context context, MainFragment mainFragment) {
         mDataList = dataList;
@@ -73,8 +77,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 Log.d("Binding", "Binding " + film.getTitle());
             filmHolder.text.setText(film.getTitle());
             filmHolder.popularity.setText(String.valueOf(film.getPopularity()));
-
-            Picasso.with(mAppContext).load("https://image.tmdb.org/t/p/w500/" + film.getBackdrop()).into(filmHolder.backdropIv, new com.squareup.picasso.Callback() {
+            Picasso.with(mAppContext).load(String.format(BACKDROP_URL, film.getBackdrop()))
+                    .into(filmHolder.backdropIv, new com.squareup.picasso.Callback() {
                 @Override
                 public void onSuccess() {
                     Palette palette = Palette.generate(((BitmapDrawable) filmHolder.backdropIv.getDrawable()).getBitmap());

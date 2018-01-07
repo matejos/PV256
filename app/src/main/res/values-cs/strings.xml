@@ -9,6 +9,7 @@
     <string name="favoriteAdded">přidáno k oblíbeným</string>
     <string name="discover">Objevovat</string>
     <string name="favorites">Oblíbené</string>
+    <string name="overview">Přehled</string>
     <string-array name="menu_items">
         <item>Nejnovší</item>
         <item>Populární</item>

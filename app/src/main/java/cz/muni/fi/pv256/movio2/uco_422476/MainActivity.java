@@ -7,13 +7,19 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.SwitchCompat;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.View;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.ListView;
+import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFilmSelectListener {
 
@@ -25,7 +31,15 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private String[] mMenuItems;
     private boolean mDrawerOpen;
     protected static SparseArray<Object> mData = new SparseArray<Object>();
+    protected static ArrayList<Film> mFavoriteData = new ArrayList<Film>();
     protected static int mCategory = 0;
+    private SwitchCompat mSwitch;
+    private boolean mSwitched;
+    private int mPosition;
+    private TextView mTitleTextView;
+    public static final String SELECTED_FILM = "selected_film";
+    public static final String SWITCH = "switch";
+    public static final String POSITION = "position";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,12 +53,25 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
                         .replace(R.id.film_detail_container, new DetailFragment(), DetailFragment.TAG)
                         .commit();
             }
+            mPosition = getIntent().getIntExtra(POSITION, ListView.INVALID_POSITION);
+            Film film = getIntent().getParcelableExtra(SELECTED_FILM);
+            if (film != null) {
+                onFilmSelect(film, mPosition);
+            }
+            mSwitched = getIntent().getBooleanExtra(SWITCH, false);
+
+            ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).mPosition = mPosition;
+            ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).updateData();
         } else {
             mTwoPane = false;
         }
-        mTitle = getTitle();
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SWITCH)) {
+            mSwitched = savedInstanceState.getBoolean(SWITCH);
+        }
 
         mMenuItems = getResources().getStringArray(R.array.menu_items);
+        mTitle = mMenuItems[mCategory];
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
@@ -68,14 +95,14 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         };
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        selectItem(mCategory);
+        mDrawerList.setItemChecked(mCategory, true);
 
         if (mDrawerOpen)
         {
             mDrawerLayout.openDrawer(GravityCompat.START);
         }
     }
+
 
 
     @Override
@@ -87,7 +114,52 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         mDrawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+        setTitle(mTitle);
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(SWITCH, mSwitch.isChecked());
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        MenuItem item = menu.findItem(R.id.switchForActionBar);
+        item.setActionView(R.layout.switch_layout);
+        mSwitch = (SwitchCompat) item.getActionView().findViewById(R.id.switchForActionBar);
+        mTitleTextView = (TextView) item.getActionView().findViewById(R.id.actionBarTitle);
+        mSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDrawerLayout.closeDrawer(GravityCompat.START);
+            }
+        });
+        mSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (compoundButton.isChecked()) {
+                    setTitle("");
+                    compoundButton.setText(getResources().getString(R.string.favorites));
+                    compoundButton.setChecked(true);
+                    MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+                    mainFragment.setIsFavorite(true);
+                    mainFragment.updateData();
+
+                } else {
+                    setTitle(mMenuItems[mCategory]);
+                    compoundButton.setText(getResources().getString(R.string.discover));
+                    compoundButton.setChecked(false);
+                    MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+                    mainFragment.setIsFavorite(false);
+                    mainFragment.updateData();
+                }
+            }
+        });
+        mSwitch.setChecked(mSwitched);
+        return true;
     }
 
     @Override
@@ -106,9 +178,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            if (mSwitch.isChecked())
+                mSwitch.toggle();
             selectItem(position);
             MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
-            mainFragment.downloadAndUpdate();
+            mainFragment.updateData();
         }
     }
 
@@ -122,11 +196,11 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     @Override
     public void setTitle(CharSequence title) {
         mTitle = title;
-        getSupportActionBar().setTitle(mTitle);
+        mTitleTextView.setText(mTitle);
     }
 
     @Override
-    public void onFilmSelect(Film film) {
+    public void onFilmSelect(Film film, int position) {
         if (mTwoPane) {
             FragmentManager fm = getSupportFragmentManager();
 
@@ -138,6 +212,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
         } else {
             Intent intent = new Intent(this, FilmDetailActivity.class);
             intent.putExtra(FilmDetailActivity.DETAILED_FILM, film);
+            intent.putExtra(FilmDetailActivity.SWITCH, mSwitch.isChecked());
+            intent.putExtra(FilmDetailActivity.POSITION, position);
             startActivity(intent);
         }
     }

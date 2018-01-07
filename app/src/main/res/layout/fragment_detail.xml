@@ -34,9 +34,38 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/detail_film"
             android:layout_marginStart="10dp"
-            android:layout_toRightOf="@id/detail_icon"
+            android:layout_toEndOf="@id/detail_icon"
             android:textAppearance="?android:textAppearanceLarge"
             android:textSize="8pt"/>
+
+        <ImageView
+            android:id="@+id/detail_star"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/star"
+            android:maxWidth="40dp"
+            android:layout_marginStart="10dp"
+            android:adjustViewBounds="true"
+            android:layout_below="@id/detail_film_low"
+            android:layout_toEndOf="@id/detail_icon"/>
+
+        <TextView
+            android:id="@+id/detail_popularity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/detail_star"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:layout_below="@id/detail_film_low"
+            android:textSize="13pt"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/favorite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/detail_icon"
+            android:layout_alignParentEnd="true"
+            android:src="@mipmap/ic_add"/>
     </RelativeLayout>
 
     <TextView

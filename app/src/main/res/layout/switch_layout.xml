@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/switchView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+    <android.support.v7.widget.SwitchCompat
+        android:id="@+id/switchForActionBar"
+        android:layout_width="160dp"
+        android:layout_height="105dp"
+        android:layout_alignParentRight="true"
+        android:checked="false"
+        android:paddingEnd="20dp"
+        android:paddingStart="5dp"
+        android:text="@string/discover"
+        android:textAlignment="textEnd"
+        android:textColor="#fff"
+        android:textSize="8pt"/>
+
+    <TextView
+        android:id="@+id/actionBarTitle"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_gravity="center"
+        android:layout_alignBaseline="@id/switchForActionBar"
+        android:textColor="#fff"
+        android:textSize="8pt"/>
+
+</RelativeLayout>

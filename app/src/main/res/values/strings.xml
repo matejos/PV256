@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Movio 2</string>
     <string-array name="menu_items">
         <item>Latest</item>
         <item>Popular</item>

@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
 
     private void selectItem(int position) {
         mDrawerList.setItemChecked(position, true);
-        setTitle(mMenuItems[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
         ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).scrollToCategory(position);
     }

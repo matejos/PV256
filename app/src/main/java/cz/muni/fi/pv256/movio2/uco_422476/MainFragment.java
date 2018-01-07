@@ -33,7 +33,7 @@ public class MainFragment extends Fragment {
     private OnFilmSelectListener mListener;
     private Context mContext;
     private RecyclerView mRecyclerView;
-    private ArrayList<Object> mDataList;
+    private ArrayList<ListItem> mDataList;
 
     @Override
     public void onAttach(Context activity) {
@@ -91,9 +91,10 @@ public class MainFragment extends Fragment {
 
     private boolean fillRecyclerView(View rootView) {
         mDataList = new ArrayList<>();
-        mDataList.add("Latest");
+        String[] categories = getResources().getStringArray(R.array.menu_items);
+        mDataList.add(new Category(categories[0]));
         mDataList.addAll(FilmData.getInstance().getLatestFilms());
-        mDataList.add("Popular");
+        mDataList.add(new Category(categories[1]));
         mDataList.addAll(FilmData.getInstance().getPopularFilms());
 
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerview_films);
@@ -105,7 +106,7 @@ public class MainFragment extends Fragment {
         return false;
     }
 
-    private void setAdapter(RecyclerView filmRV, final ArrayList<Object> movieList) {
+    private void setAdapter(RecyclerView filmRV, final ArrayList<ListItem> movieList) {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(movieList, mContext, this);
         filmRV.setAdapter(adapter);
         filmRV.setLayoutManager(new LinearLayoutManager(mContext));

@@ -10,7 +10,6 @@
     <string name="favoriteAdded">added to favorites</string>
     <string name="discover">Discover</string>
     <string name="favorites">Favorites</string>
-    "Data has not been received"
     <string-array name="menu_items">
         <item>Latest</item>
         <item>Popular</item>

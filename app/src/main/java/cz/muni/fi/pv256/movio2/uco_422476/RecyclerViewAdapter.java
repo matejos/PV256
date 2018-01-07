@@ -20,21 +20,28 @@ import java.util.ArrayList;
 /**
  * Created by Matej on 3.11.2017.
  */
-public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>{
+public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private Context mAppContext;
-    private ArrayList<Film> mFilmList;
+    private ArrayList<Object> mDataList;
     private MainFragment mMainFragment;
+    private final static int CATEGORY = 0;
+    private final static int FILM = 1;
 
-    public RecyclerViewAdapter(ArrayList<Film> filmList, Context context, MainFragment mainFragment) {
-        mFilmList = filmList;
+    public RecyclerViewAdapter(ArrayList<Object> dataList, Context context, MainFragment mainFragment) {
+        mDataList = dataList;
         mMainFragment = mainFragment;
         mAppContext = context.getApplicationContext();
     }
 
     @Override
+    public int getItemViewType(int position) {
+        return mDataList.get(position) instanceof Film ? FILM : CATEGORY;
+    }
+
+    @Override
     public int getItemCount() {
-        return mFilmList.size();
+        return mDataList.size();
     }
 
     @Override
@@ -43,69 +50,91 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = (LayoutInflater) mAppContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.list_item_film, parent, false);
-        TextView text = (TextView) view.findViewById(R.id.list_item_text);
+        View view;
         if(BuildConfig.logging)
             Log.d("Inflating", "Inflating " + parent.getId());
-        return new ViewHolder(view);
+        if (viewType == FILM){
+            view = inflater.inflate(R.layout.list_item_film, parent, false);
+            return new FilmViewHolder(view);
+        } else {
+            view = inflater.inflate(R.layout.list_item_category, parent, false);
+            return new CategoryViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, final int position) {
-        Film film = mFilmList.get(position);
-        if(BuildConfig.logging)
-            Log.d("Binding", "Binding " + film.getTitle());
-        holder.text.setText(film.getTitle());
-        holder.popularity.setText(String.valueOf(film.getPopularity()));
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+        if(mDataList.get(position) instanceof Film) {
+            Film film = (Film)mDataList.get(position);
+            final FilmViewHolder filmHolder = (FilmViewHolder) holder;
+            if (BuildConfig.logging)
+                Log.d("Binding", "Binding " + film.getTitle());
+            filmHolder.text.setText(film.getTitle());
+            filmHolder.popularity.setText(String.valueOf(film.getPopularity()));
 
-        Picasso.with(mAppContext).load("https://image.tmdb.org/t/p/w500/" + film.getBackdrop()).into(holder.backdropIv, new com.squareup.picasso.Callback() {
-            @Override
-            public void onSuccess() {
-                Palette palette = Palette.generate(((BitmapDrawable)holder.backdropIv.getDrawable()).getBitmap());
-                int backgroundColorOpaque = palette.getDarkVibrantColor(0x000000);
-                int backgroundColorTransparent = Color.argb(128, Color.red(backgroundColorOpaque), Color.green(backgroundColorOpaque), Color.blue(backgroundColorOpaque));
-                GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[] {Color.TRANSPARENT, backgroundColorOpaque});
-                holder.text.setBackgroundColor(backgroundColorTransparent);
-                holder.star.setBackground(gd);
-                holder.popularity.setBackgroundColor(backgroundColorOpaque);
-            }
+            Picasso.with(mAppContext).load("https://image.tmdb.org/t/p/w500/" + film.getBackdrop()).into(filmHolder.backdropIv, new com.squareup.picasso.Callback() {
+                @Override
+                public void onSuccess() {
+                    Palette palette = Palette.generate(((BitmapDrawable) filmHolder.backdropIv.getDrawable()).getBitmap());
+                    int backgroundColorOpaque = palette.getDarkVibrantColor(0x000000);
+                    int backgroundColorTransparent = Color.argb(128, Color.red(backgroundColorOpaque), Color.green(backgroundColorOpaque), Color.blue(backgroundColorOpaque));
+                    GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{Color.TRANSPARENT, backgroundColorOpaque});
+                    filmHolder.text.setBackgroundColor(backgroundColorTransparent);
+                    filmHolder.star.setBackground(gd);
+                    filmHolder.popularity.setBackgroundColor(backgroundColorOpaque);
+                }
 
-            @Override
-            public void onError() {
-                if(BuildConfig.logging)
-                    Log.e("Loading image failed", "Error loading backdrop image");
-            }
-        });
+                @Override
+                public void onError() {
+                    if (BuildConfig.logging)
+                        Log.e("Loading image failed", "Error loading backdrop image");
+                }
+            });
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mMainFragment.clickedFilm(position);
-            }
-        });
+            filmHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mMainFragment.clickedFilm(position);
+                }
+            });
 
-        holder.itemView.setTag(film);
+            filmHolder.itemView.setTag(film);
+        }
+        else {
+            CategoryViewHolder categoryHolder = (CategoryViewHolder) holder;
+            categoryHolder.text.setText((String) mDataList.get(position));
+        }
     }
 
-    public void dataUpdate(ArrayList<Film> data) {
-        this.mFilmList = data;
+    public void dataUpdate(ArrayList<Object> data) {
+        this.mDataList = data;
         notifyDataSetChanged();
     }
 
-    static class ViewHolder extends RecyclerView.ViewHolder {
+    static class FilmViewHolder extends RecyclerView.ViewHolder {
+        private ImageView coverIv;
         private ImageView backdropIv;
         public TextView text;
         public ImageView star;
         public TextView popularity;
 
-        public ViewHolder(View view) {
+        public FilmViewHolder(View view) {
             super(view);
             text = (TextView) itemView.findViewById(R.id.list_item_text);
             backdropIv = (ImageView) view.findViewById(R.id.list_item_icon);
             star = (ImageView) itemView.findViewById(R.id.list_item_star);
             popularity = (TextView) itemView.findViewById(R.id.list_item_popularity);
+        }
+    }
+
+    static class CategoryViewHolder extends RecyclerView.ViewHolder {
+        public TextView text;
+
+        public CategoryViewHolder(View view) {
+            super(view);
+            text = (TextView) itemView.findViewById(R.id.list_item_category);
         }
     }
 }

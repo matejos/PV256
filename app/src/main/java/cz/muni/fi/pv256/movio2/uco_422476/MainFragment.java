@@ -13,6 +13,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.util.Log;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.widget.ListView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,12 +40,12 @@ import static cz.muni.fi.pv256.movio2.uco_422476.DownloadService.POPULAR;
  * Created by Matej on 3.11.2017.
  */
 
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Film>>{
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<Film>> {
 
     private static final String TAG = MainFragment.class.getSimpleName();
     private static final String SELECTED_KEY = "selected_position";
 
-    public int mPosition = ListView.INVALID_POSITION;
+    private int mPosition = ListView.INVALID_POSITION;
     private OnFilmSelectListener mListener;
     private Context mContext;
     private RecyclerView mRecyclerView;
@@ -55,9 +57,21 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private FilmManager mFilmManager;
     private FilmDbHelper mDbHelper;
 
-    public boolean getIsFavorite() { return mIsFavorite; }
+    public boolean getIsFavorite() {
+        return mIsFavorite;
+    }
 
-    public void setIsFavorite(boolean isFavorite) { mIsFavorite = isFavorite; }
+    public void setIsFavorite(boolean isFavorite) {
+        mIsFavorite = isFavorite;
+    }
+
+    public int getPosition() {
+        return mPosition;
+    }
+
+    public void setPosition(int position) {
+        mPosition = position;
+    }
 
     @Override
     public void onAttach(Context activity) {
@@ -66,7 +80,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         try {
             mListener = (OnFilmSelectListener) activity;
         } catch (ClassCastException e) {
-            if(BuildConfig.logging)
+            if (BuildConfig.logging)
                 Log.e(TAG, "Activity must implement OnFilmSelectListener", e);
         }
     }
@@ -84,7 +98,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         if (mIsFavorite) {
             updateData();
@@ -101,9 +115,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
             if (mPosition != ListView.INVALID_POSITION) {
                 mRecyclerView.smoothScrollToPosition(mPosition);
+                Log.d("xd shit scroll", String.valueOf(mPosition));
             }
         }
-        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Film>(), mContext, this);
+        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Object>(), mContext, this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -111,19 +126,19 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         return view;
     }
 
-    public void clickedFilm(int position)
-    {
+    public void clickedFilm(int position) {
         if (position == ListView.INVALID_POSITION)
             return;
         mPosition = position;
         if (mIsFavorite)
-            mListener.onFilmSelect(mFavoriteData.get(position), position);
+            mListener.onFilmSelect((Film)mFavoriteData.get(position), position);
         else
-            mListener.onFilmSelect(((ArrayList<Film>)mData.get(mCategory)).get(position), position);
+            mListener.onFilmSelect(((Film) mData.get(position)), position);
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-            mRecyclerView.smoothScrollToPosition(mPosition);
+                mRecyclerView.smoothScrollToPosition(mPosition);
+                Log.d("xd shit scroll2", String.valueOf(mPosition));
             }
         });
     }
@@ -153,11 +168,18 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Film>> loader) {
+    public void onLoaderReset (Loader < List < Film >> loader) {
     }
 
     public interface OnFilmSelectListener {
         void onFilmSelect(Film film, int position);
+    }
+
+    private void setAdapter(RecyclerView filmRV, final ArrayList<Object> movieList) {
+        RecyclerViewAdapter adapter = new RecyclerViewAdapter(movieList, mContext, this);
+        filmRV.setAdapter(adapter);
+        filmRV.setLayoutManager(new LinearLayoutManager(mContext));
+        filmRV.setItemAnimator(new DefaultItemAnimator());
     }
 
     public void updateData() {
@@ -166,26 +188,24 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             mDatabase = mDbHelper.getWritableDatabase();
             mFilmManager = new FilmManager(mDatabase);
             getLoaderManager().restartLoader(1, null, this);
-        }
-        else {
+        } else {
             downloadAndUpdate();
         }
     }
 
     public void downloadAndUpdate() {
-        if (mData.get(mCategory) == null) {
+        if (mData == null || mData.isEmpty()) {
             Intent intent = new Intent(getActivity(), DownloadService.class);
             getActivity().startService(intent);
             IntentFilter intentFilter = new IntentFilter(ACTION);
             mReceiver = new DownloadReceiver();
             LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mReceiver, intentFilter);
-        }
-        else {
-            updateViewAdapter((ArrayList<Film>)mData.get(mCategory));
+        } else {
+            updateViewAdapter(mData);
         }
     }
 
-    private void updateViewAdapter(final ArrayList<Film> filmList) {
+    private void updateViewAdapter(final ArrayList<Object> filmList) {
         if (getActivity() == null)
             return;
         getActivity().runOnUiThread(new Runnable() {
@@ -194,9 +214,9 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 mRecyclerViewAdapter.dataUpdate(filmList);
                 if (filmList != null && !(filmList.isEmpty())) {
                     mRecyclerView.setVisibility(View.VISIBLE);
-                    if (mPosition == ListView.INVALID_POSITION)
-                        mPosition = 0;
-                    mRecyclerView.smoothScrollToPosition(mPosition);
+                    if (mPosition != ListView.INVALID_POSITION)
+                        mRecyclerView.smoothScrollToPosition(mPosition);
+                    Log.d("xd shit scroll3", String.valueOf(mPosition));
                     mEmptyView.setVisibility(View.GONE);
                 } else {
                     mRecyclerView.setVisibility(View.GONE);
@@ -206,33 +226,50 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         });
     }
 
+
     public class DownloadReceiver extends BroadcastReceiver {
-         @Override
-         public void onReceive(Context context, Intent intent) {
+        @Override
+        public void onReceive(Context context, Intent intent) {
             String error = intent.getStringExtra(ERROR);
-            if(error.equals(NO_ERROR)) {
-                    mData.put(mCategory, new ArrayList<Film>());
-                    switch (mCategory) {
-                        case 0:
-                            ((ArrayList<Film>)mData.get(mCategory)).addAll(getFilms((ArrayList<FilmDTO>)intent.getSerializableExtra(LATEST)));
-                            break;
-                        case 1:
-                            ((ArrayList<Film>)mData.get(mCategory)).addAll(getFilms((ArrayList<FilmDTO>)intent.getSerializableExtra(POPULAR)));
-                            break;
-                    }
-                    updateViewAdapter((ArrayList<Film>)mData.get(mCategory));
-                }
-            else {
-                updateViewAdapter((ArrayList<Film>)mData.get(mCategory));
+            if (error.equals(NO_ERROR)) {
+                mData = new ArrayList<>();
+                mData.add("Latest");
+                mData.addAll(getFilms((ArrayList<FilmDTO>) intent.getSerializableExtra(LATEST)));
+                mData.add("Popular");
+                mData.addAll(getFilms((ArrayList<FilmDTO>) intent.getSerializableExtra(POPULAR)));
+                updateViewAdapter(mData);
+            } else {
+                updateViewAdapter(mData);
             }
         }
-        private ArrayList<Film> getFilms(ArrayList<FilmDTO> filmList){
+
+        private ArrayList<Film> getFilms(ArrayList<FilmDTO> filmList) {
             ArrayList<Film> films = new ArrayList<Film>();
             for (FilmDTO m : filmList) {
                 Film film = new Film(Long.parseLong(m.getId(), 10), m.getReleaseDateAsLong(), m.getCoverPath(), m.getTitle(), m.getBackdrop(), m.getPopularityAsFloat(), m.getDescription());
                 films.add(film);
-                }
+            }
             return films;
         }
-     }
+    }
+
+    public void scrollToCategory(int category) {
+        mPosition = ListView.INVALID_POSITION;
+        ArrayList<Integer> categories = new ArrayList<>();
+        for (int i = 0; i < mData.size(); i++) {
+            if (!(mData.get(i) instanceof Film)) {
+                {
+                    categories.add(i);
+                }
+            }
+        }
+        RecyclerView.SmoothScroller smoothScroller = new LinearSmoothScroller(mContext) {
+            @Override
+            protected int getVerticalSnapPreference() {
+                return LinearSmoothScroller.SNAP_TO_START;
+            }
+        };
+        smoothScroller.setTargetPosition(categories.get(category));
+        ((LinearLayoutManager) mRecyclerView.getLayoutManager()).startSmoothScroll(smoothScroller);
+    }
 }

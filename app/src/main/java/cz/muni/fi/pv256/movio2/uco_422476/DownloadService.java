@@ -81,18 +81,15 @@ public class DownloadService extends IntentService {
                 Toast.makeText(this, R.string.dataDownloading, Toast.LENGTH_SHORT).show();
                 Call<FilmList> request;
                 FilmList films;
-                switch (mCategory) {
-                    case 0:
+
                         request = service.getLatestFilms(dateMonthAgoString, dateNowString);
                         films = request.execute().body();
                         broadcastIntent.putExtra(LATEST, new ArrayList<FilmDTO>(films.getResults()));
-                        break;
-                    case 1:
+
                         request = service.getPopularFilms();
                         films = request.execute().body();
                         broadcastIntent.putExtra(POPULAR, new ArrayList<FilmDTO>(films.getResults()));
-                        break;
-                }
+
                 broadcastIntent.putExtra(ERROR, NO_ERROR);
                 LocalBroadcastManager.getInstance(this).sendBroadcast(broadcastIntent);
                 doneDownloadNotification();

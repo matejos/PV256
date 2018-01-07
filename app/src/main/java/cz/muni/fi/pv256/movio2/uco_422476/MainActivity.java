@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.OnFilmSelectListener {
 
@@ -30,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private ActionBarDrawerToggle mDrawerToggle;
     private String[] mMenuItems;
     private boolean mDrawerOpen;
-    protected static SparseArray<Object> mData = new SparseArray<Object>();
-    protected static ArrayList<Film> mFavoriteData = new ArrayList<Film>();
+    protected static ArrayList<Object> mData = new ArrayList<>();
+    protected static ArrayList<Object> mFavoriteData = new ArrayList<>();
     protected static int mCategory = 0;
     private SwitchCompat mSwitch;
     private boolean mSwitched;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
             }
             mSwitched = getIntent().getBooleanExtra(SWITCH, false);
 
-            ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).mPosition = mPosition;
+            ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).setPosition(mPosition);
             ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).updateData();
         } else {
             mTwoPane = false;
@@ -145,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
                     compoundButton.setText(getResources().getString(R.string.favorites));
                     compoundButton.setChecked(true);
                     MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+                    mainFragment.setPosition(0);
                     mainFragment.setIsFavorite(true);
                     mainFragment.updateData();
 
@@ -153,6 +155,7 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
                     compoundButton.setText(getResources().getString(R.string.discover));
                     compoundButton.setChecked(false);
                     MainFragment mainFragment = (MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main);
+                    mainFragment.setPosition(0);
                     mainFragment.setIsFavorite(false);
                     mainFragment.updateData();
                 }
@@ -188,15 +191,9 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
 
     private void selectItem(int position) {
         mDrawerList.setItemChecked(position, true);
-        setTitle(mMenuItems[position]);
         mCategory = position;
         mDrawerLayout.closeDrawer(mDrawerList);
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        mTitleTextView.setText(mTitle);
+        ((MainFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_main)).scrollToCategory(position);
     }
 
     @Override

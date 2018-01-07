@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="SecondaryTheme" parent="MainTheme">
+        <item name="colorPrimary">#0097A7</item>
+        <item name="colorPrimaryDark">#006064</item>
+        <item name="colorAccent">#FF6858</item>
+    </style>
+</resources>

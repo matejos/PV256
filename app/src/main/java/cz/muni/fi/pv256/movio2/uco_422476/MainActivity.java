@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.OnFi
     private ActionBarDrawerToggle mDrawerToggle;
     private String[] mMenuItems;
     private boolean mDrawerOpen;
-    protected static ArrayList<Object> mData = new ArrayList<>();
-    protected static ArrayList<Object> mFavoriteData = new ArrayList<>();
+    protected static ArrayList<ListItem> mData = new ArrayList<>();
+    protected static ArrayList<ListItem> mFavoriteData = new ArrayList<>();
     protected static int mCategory = 0;
     private SwitchCompat mSwitch;
     private boolean mSwitched;

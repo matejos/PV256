@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by Matej on 3.11.2017.
  */
-public class Film implements Parcelable {
+public class Film implements Parcelable, ListItem {
 
     private Long mId;
     private long mReleaseDate;

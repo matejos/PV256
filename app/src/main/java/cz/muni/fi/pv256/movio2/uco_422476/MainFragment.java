@@ -118,7 +118,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 Log.d("xd shit scroll", String.valueOf(mPosition));
             }
         }
-        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<Object>(), mContext, this);
+        mRecyclerViewAdapter = new RecyclerViewAdapter(new ArrayList<ListItem>(), mContext, this);
         mRecyclerView.setAdapter(mRecyclerViewAdapter);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -168,14 +168,14 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     }
 
     @Override
-    public void onLoaderReset (Loader < List < Film >> loader) {
+    public void onLoaderReset(Loader<List<Film>> loader) {
     }
 
     public interface OnFilmSelectListener {
         void onFilmSelect(Film film, int position);
     }
 
-    private void setAdapter(RecyclerView filmRV, final ArrayList<Object> movieList) {
+    private void setAdapter(RecyclerView filmRV, final ArrayList<ListItem> movieList) {
         RecyclerViewAdapter adapter = new RecyclerViewAdapter(movieList, mContext, this);
         filmRV.setAdapter(adapter);
         filmRV.setLayoutManager(new LinearLayoutManager(mContext));
@@ -205,7 +205,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         }
     }
 
-    private void updateViewAdapter(final ArrayList<Object> filmList) {
+    private void updateViewAdapter(final ArrayList<ListItem> filmList) {
         if (getActivity() == null)
             return;
         getActivity().runOnUiThread(new Runnable() {
@@ -232,10 +232,11 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         public void onReceive(Context context, Intent intent) {
             String error = intent.getStringExtra(ERROR);
             if (error.equals(NO_ERROR)) {
+                String[] categories = getResources().getStringArray(R.array.menu_items);
                 mData = new ArrayList<>();
-                mData.add("Latest");
+                mData.add(new Category(categories[0]));
                 mData.addAll(getFilms((ArrayList<FilmDTO>) intent.getSerializableExtra(LATEST)));
-                mData.add("Popular");
+                mData.add(new Category(categories[1]));
                 mData.addAll(getFilms((ArrayList<FilmDTO>) intent.getSerializableExtra(POPULAR)));
                 updateViewAdapter(mData);
             } else {

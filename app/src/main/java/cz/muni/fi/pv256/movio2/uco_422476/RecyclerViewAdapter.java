@@ -23,12 +23,12 @@ import java.util.ArrayList;
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
     private Context mAppContext;
-    private ArrayList<Object> mDataList;
+    private ArrayList<ListItem> mDataList;
     private MainFragment mMainFragment;
     private final static int CATEGORY = 0;
     private final static int FILM = 1;
 
-    public RecyclerViewAdapter(ArrayList<Object> dataList, Context context, MainFragment mainFragment) {
+    public RecyclerViewAdapter(ArrayList<ListItem> dataList, Context context, MainFragment mainFragment) {
         mDataList = dataList;
         mMainFragment = mainFragment;
         mAppContext = context.getApplicationContext();
@@ -104,11 +104,11 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         else {
             CategoryViewHolder categoryHolder = (CategoryViewHolder) holder;
-            categoryHolder.text.setText((String) mDataList.get(position));
+            categoryHolder.text.setText(((Category) mDataList.get(position)).getName());
         }
     }
 
-    public void dataUpdate(ArrayList<Object> data) {
+    public void dataUpdate(ArrayList<ListItem> data) {
         this.mDataList = data;
         notifyDataSetChanged();
     }

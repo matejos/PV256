@@ -1,0 +1,110 @@
+<!-- Master layout. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+<android.support.design.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:orientation="vertical"
+            android:background="?colorPrimary">
+
+            <ImageView
+                android:id="@+id/detail_backdrop"
+                android:layout_width="match_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center"
+                android:adjustViewBounds="true"/>
+
+            <ImageView
+                android:id="@+id/detail_cover"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="-60dp"
+                android:layout_below="@id/detail_backdrop"/>
+
+            <TextView
+                android:id="@+id/detail_film"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/detail_cover"
+                android:layout_below="@id/detail_backdrop"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="30dp"
+                android:layout_marginTop="10dp"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textSize="12pt"/>
+
+            <TextView
+                android:id="@+id/detail_film_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/detail_film"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/detail_cover"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:textSize="8pt"/>
+
+            <ImageView
+                android:id="@+id/detail_star"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/star"
+                android:maxWidth="32dp"
+                android:layout_marginStart="10dp"
+                android:adjustViewBounds="true"
+                android:layout_below="@id/detail_film_low"
+                android:layout_toEndOf="@id/detail_cover"/>
+
+            <TextView
+                android:id="@+id/detail_popularity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_toEndOf="@id/detail_star"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_below="@id/detail_film_low"
+                android:textSize="10pt"/>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:textAppearance="?android:textAppearanceLarge"
+            android:text="@string/overview"/>
+
+        <TextView
+            android:id="@+id/detail_film_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:textAppearance="?android:textAppearanceMedium"/>
+
+    </LinearLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/detail_backdrop"
+        app:layout_anchorGravity="bottom|right|end"
+        android:src="@mipmap/ic_add"/>
+
+</android.support.design.widget.CoordinatorLayout>
+</ScrollView>

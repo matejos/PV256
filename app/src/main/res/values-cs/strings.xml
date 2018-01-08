@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="filmDetail">Detail filmu</string>
+    <string name="dataDownloading">Stahuji dáta…</string>
+    <string name="dataSuccess">Dáta úspěšně staženy</string>
+    <string name="dataError">Vyskytl se problém při stahování dat</string>
+    <string name="noConnection">Žádné připojení!</string>
+    <string name="favoriteRemoved">odstraněno z oblíbených</string>
+    <string name="favoriteAdded">přidáno k oblíbeným</string>
+    <string name="discover">Objevovat</string>
+    <string name="favorites">Oblíbené</string>
+    <string name="overview">Přehled</string>
+    <string-array name="menu_items">
+        <item>Nejnovší</item>
+        <item>Populární</item>
+    </string-array>
+</resources>

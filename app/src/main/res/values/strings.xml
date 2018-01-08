@@ -1,3 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="filmDetail">Film detail</string>
+    <string name="dataDownloading">Downloading data…</string>
+    <string name="dataSuccess">Data successfully downloaded</string>
+    <string name="dataError">Error occurred while downloading data</string>
+    <string name="noConnection">No Internet connection!</string>
+    <string name="favoriteRemoved">removed from favorites</string>
+    <string name="favoriteAdded">added to favorites</string>
+    <string name="discover">Discover</string>
+    <string name="favorites">Favorites</string>
+    <string name="overview">Overview</string>
+    <string-array name="menu_items">
+        <item>Latest</item>
+        <item>Popular</item>
+    </string-array>
 </resources>

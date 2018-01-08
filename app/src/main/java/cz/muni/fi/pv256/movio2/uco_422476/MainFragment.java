@@ -262,7 +262,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
                 }
             }
         }
-        scrollToPosition(categories.get(category));
+        if (category < categories.size())
+            scrollToPosition(categories.get(category));
     }
 
     private void scrollToPosition(int position) {

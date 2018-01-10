@@ -23,3 +23,18 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *; }
+-dontwarn com.squareup.okhttp.**
+-keep class com.squareup.okhttp.** { *; }
+-dontwarn okio.**
+-keep class okio.** { *; }
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *; }
+
+-keep class com.squareup.picasso.** { *; }
+-keep class com.google.gson.** { *; }
+
+-keep class cz.muni.fi.pv256.movio2.uco_422476.** { *; }
